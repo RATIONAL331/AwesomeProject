@@ -21,8 +21,11 @@ public class SecurityConfig {
 	@Bean
 	public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
 		http.authorizeExchange()
+		    .pathMatchers("/create-user").permitAll()
 		    .anyExchange().authenticated()
 		    .and()
+		    .csrf().disable()
+		    .cors().disable()
 		    .httpBasic()
 		    .and()
 		    .formLogin();

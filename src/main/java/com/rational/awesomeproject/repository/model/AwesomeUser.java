@@ -1,7 +1,9 @@
 package com.rational.awesomeproject.repository.model;
 
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -25,7 +27,11 @@ public class AwesomeUser implements UserDetails {
 
 	private String username;
 	private String rootStorageId;
+
+	@CreatedDate
 	private OffsetDateTime createdAt;
+
+	@LastModifiedDate
 	private OffsetDateTime updatedAt;
 
 	private String password;

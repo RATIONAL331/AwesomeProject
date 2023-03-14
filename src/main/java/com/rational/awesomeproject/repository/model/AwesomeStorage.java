@@ -2,7 +2,9 @@ package com.rational.awesomeproject.repository.model;
 
 import com.rational.awesomeproject.common.enums.StorageExtType;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.OffsetDateTime;
@@ -21,7 +23,11 @@ public class AwesomeStorage {
 	private String storageName;
 	private long storageFileSize;
 	private StorageExtType extType;
+
+	@CreatedDate
 	private OffsetDateTime createdAt;
+
+	@LastModifiedDate
 	private OffsetDateTime updatedAt;
 	private OffsetDateTime deletedAt;
 
