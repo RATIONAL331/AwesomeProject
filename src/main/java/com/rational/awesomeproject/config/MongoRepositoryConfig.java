@@ -9,11 +9,11 @@ import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.repository.config.EnableReactiveMongoRepositories;
 
 @Configuration
-@EnableReactiveMongoRepositories
+@EnableReactiveMongoRepositories(basePackages = "com.rational.awesomeproject")
 public class MongoRepositoryConfig extends AbstractReactiveMongoConfiguration {
 	@Bean
 	public MongoClient mongoClient() {
-		return MongoClients.create();
+		return MongoClients.create("mongodb://localhost:27017");
 	}
 
 	@Bean

@@ -9,13 +9,12 @@ import java.time.OffsetDateTime;
 
 @Getter
 @Setter
-@Builder
 @Document
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class Storage {
+public class AwesomeStorage {
 	@Id
-	private String storageId;
+	private String id;
 
 	private String userId;
 	private String parentStorageId;
@@ -25,4 +24,19 @@ public class Storage {
 	private OffsetDateTime createdAt;
 	private OffsetDateTime updatedAt;
 	private OffsetDateTime deletedAt;
+
+	public static AwesomeStorage makeDefault(String userId) {
+		AwesomeStorage awesomeStorage = new AwesomeStorage();
+		awesomeStorage.setUserId(userId);
+		awesomeStorage.setParentStorageId(null);
+		awesomeStorage.setStorageName("root::" + userId);
+		awesomeStorage.setStorageFileSize(0);
+		awesomeStorage.setExtType(StorageExtType.FOLDER);
+
+		OffsetDateTime now = OffsetDateTime.now();
+		awesomeStorage.setCreatedAt(now);
+		awesomeStorage.setUpdatedAt(now);
+		awesomeStorage.setCreatedAt(null);
+		return awesomeStorage;
+	}
 }
