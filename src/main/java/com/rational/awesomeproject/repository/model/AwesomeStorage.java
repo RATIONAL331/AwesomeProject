@@ -32,10 +32,14 @@ public class AwesomeStorage {
 	private OffsetDateTime deletedAt;
 
 	public static AwesomeStorage makeDefault(String userId) {
+		return makeFolder(userId, null, "root::" + userId);
+	}
+
+	public static AwesomeStorage makeFolder(String userId, String parentStorageId, String folderName) {
 		AwesomeStorage awesomeStorage = new AwesomeStorage();
 		awesomeStorage.setUserId(userId);
-		awesomeStorage.setParentStorageId(null);
-		awesomeStorage.setStorageName("root::" + userId);
+		awesomeStorage.setParentStorageId(parentStorageId);
+		awesomeStorage.setStorageName(folderName);
 		awesomeStorage.setStorageFileSize(0);
 		awesomeStorage.setExtType(StorageExtType.FOLDER);
 

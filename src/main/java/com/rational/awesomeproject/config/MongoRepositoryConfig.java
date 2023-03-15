@@ -6,6 +6,8 @@ import com.rational.awesomeproject.repository.converter.OffsetDateTimeReadConver
 import com.rational.awesomeproject.repository.converter.OffsetDateTimeWriteConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.mongodb.ReactiveMongoDatabaseFactory;
+import org.springframework.data.mongodb.ReactiveMongoTransactionManager;
 import org.springframework.data.mongodb.config.AbstractReactiveMongoConfiguration;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.convert.MongoCustomConversions;
@@ -24,6 +26,11 @@ public class MongoRepositoryConfig extends AbstractReactiveMongoConfiguration {
 	@Bean
 	public ReactiveMongoTemplate reactiveMongoTemplate() {
 		return new ReactiveMongoTemplate(this.mongoClient(), this.getDatabaseName());
+	}
+
+	@Bean
+	ReactiveMongoTransactionManager transactionManager(ReactiveMongoDatabaseFactory reactiveMongoDatabaseFactory) {
+		return new ReactiveMongoTransactionManager(reactiveMongoDatabaseFactory);
 	}
 
 	@Override

@@ -5,6 +5,7 @@ import com.rational.awesomeproject.repository.AwesomeUserReactiveRepository;
 import com.rational.awesomeproject.repository.model.AwesomeStorage;
 import com.rational.awesomeproject.repository.model.AwesomeUser;
 import com.rational.awesomeproject.service.AwesomeUserService;
+import com.rational.awesomeproject.service.dto.AwesomeUserDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,9 +23,22 @@ public class AwesomeUserServiceImpl implements AwesomeUserService {
 
 	@Override
 	@Transactional
-	public Mono<AwesomeUser> createUser(String username, String rawPassword) {
+	public Mono<AwesomeUserDto> createUser(String username, String rawPassword) {
 		return userReactiveRepository.findByUsername(username)
-		                             .switchIfEmpty(initializeUser(username, rawPassword));
+		                             .switchIfEmpty(Mono.defer(() -> initializeUser(username, rawPassword)))
+		                             .map(AwesomeUserDto::of);
+	}
+
+	@Override
+	public Mono<AwesomeUserDto> getUserByUserId(String userId) {
+		return userReactiveRepository.findById(userId)
+		                             .map(AwesomeUserDto::of);
+	}
+
+	@Override
+	public Mono<AwesomeUserDto> getUserByUsername(String username) {
+		return userReactiveRepository.findByUsername(username)
+		                             .map(AwesomeUserDto::of);
 	}
 
 	private Mono<AwesomeUser> initializeUser(String username, String rawPassword) {
