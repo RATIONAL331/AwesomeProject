@@ -22,7 +22,6 @@ public class AwesomeStorageRestController {
 		String userId = "";
 		return ResponseEntity.ok(storageService.getStorageById(userId, storageId)
 		                                       .map(AwesomeStorageInfoResponse::of));
-
 	}
 
 	@GetMapping("/{storageId}/hierarchy")
@@ -40,8 +39,16 @@ public class AwesomeStorageRestController {
 		                                       .map(AwesomeStorageInfoResponse::of));
 	}
 
-	@PostMapping("/upload")
-	public Mono<AwesomeStorageInfoResponse> uploadFile(Mono<FilePart> filePartMono) {
+	@PostMapping("/{storageId}/upload")
+	public Mono<AwesomeStorageInfoResponse> uploadFile(@PathVariable String storageId,
+	                                                   @RequestPart("file") Mono<FilePart> filePartMono) {
+		String userId = "";
+		return null;
+	}
+
+	@DeleteMapping("/{storageId}")
+	public ResponseEntity<Mono<Boolean>> deleteStorage(@PathVariable String storageId) {
+		String userId = "";
 		return null;
 	}
 }
