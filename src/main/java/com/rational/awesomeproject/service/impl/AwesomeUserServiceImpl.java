@@ -8,6 +8,7 @@ import com.rational.awesomeproject.service.AwesomeUserService;
 import com.rational.awesomeproject.service.dto.AwesomeUserDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,5 +52,11 @@ public class AwesomeUserServiceImpl implements AwesomeUserService {
 			                                                                       user.setRootStorageId(storage.getId());
 			                                                                       return userReactiveRepository.save(user);
 		                                                                       }));
+	}
+
+	@Override
+	public Mono<UserDetails> findByUsername(String username) {
+		return userReactiveRepository.findByUsername(username)
+		                             .map(AwesomeUser::toUserDetails);
 	}
 }

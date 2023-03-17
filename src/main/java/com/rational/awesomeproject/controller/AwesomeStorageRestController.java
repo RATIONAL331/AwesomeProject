@@ -22,6 +22,20 @@ public class AwesomeStorageRestController {
 		                                       .map(AwesomeStorageInfoResponse::of));
 	}
 
+	@PostMapping("/{storageId}")
+	public ResponseEntity<Mono<AwesomeStorageInfoResponse>> uploadFile(@PathVariable String storageId,
+	                                                                   @RequestPart("file") Mono<FilePart> filePartMono) {
+		String userId = "64148875c91155110d5694db";
+		return ResponseEntity.ok(filePartMono.flatMap(filePart -> storageService.saveStorage(userId, storageId, filePart))
+		                                     .map(AwesomeStorageInfoResponse::of));
+	}
+
+	@DeleteMapping("/{storageId}")
+	public ResponseEntity<Mono<Boolean>> deleteStorage(@PathVariable String storageId) {
+		String userId = "64148875c91155110d5694db";
+		return ResponseEntity.ok(storageService.removeStorageByStorageId(userId, storageId));
+	}
+
 	@GetMapping("/{storageId}/hierarchy")
 	public ResponseEntity<Flux<AwesomeStorageInfoResponse>> getStorageHierarchy(@PathVariable String storageId) {
 		String userId = "64148875c91155110d5694db";
@@ -35,19 +49,5 @@ public class AwesomeStorageRestController {
 		String userId = "64148875c91155110d5694db";
 		return ResponseEntity.ok(storageService.makeFolder(userId, storageId, folderName)
 		                                       .map(AwesomeStorageInfoResponse::of));
-	}
-
-	@PostMapping("/{storageId}/upload")
-	public ResponseEntity<Mono<AwesomeStorageInfoResponse>> uploadFile(@PathVariable String storageId,
-	                                                                   @RequestPart("file") Mono<FilePart> filePartMono) {
-		String userId = "64148875c91155110d5694db";
-		return ResponseEntity.ok(filePartMono.flatMap(filePart -> storageService.saveStorage(userId, storageId, filePart))
-		                                     .map(AwesomeStorageInfoResponse::of));
-	}
-
-	@DeleteMapping("/{storageId}")
-	public ResponseEntity<Mono<Boolean>> deleteStorage(@PathVariable String storageId) {
-		String userId = "64148875c91155110d5694db";
-		return ResponseEntity.ok(storageService.removeStorageByStorageId(userId, storageId));
 	}
 }

@@ -7,6 +7,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.OffsetDateTime;
@@ -93,5 +94,12 @@ public class AwesomeUser implements UserDetails {
 	@Override
 	public boolean isEnabled() {
 		return this.enabled;
+	}
+
+	public UserDetails toUserDetails() {
+		return User.withUsername(this.username)
+		           .password(this.password)
+		           .authorities(this.getAuthorities())
+		           .build();
 	}
 }
