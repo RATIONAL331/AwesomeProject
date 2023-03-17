@@ -2,7 +2,6 @@ package com.rational.awesomeproject.controller;
 
 import com.rational.awesomeproject.controller.dto.AwesomeStorageInfoResponse;
 import com.rational.awesomeproject.service.AwesomeStorageService;
-import com.rational.awesomeproject.service.AwesomeUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.multipart.FilePart;
@@ -14,7 +13,6 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 @RequestMapping("/storage")
 public class AwesomeStorageRestController {
-	private final AwesomeUserService userService;
 	private final AwesomeStorageService storageService;
 
 	@GetMapping("/{storageId}")
@@ -40,15 +38,16 @@ public class AwesomeStorageRestController {
 	}
 
 	@PostMapping("/{storageId}/upload")
-	public Mono<AwesomeStorageInfoResponse> uploadFile(@PathVariable String storageId,
-	                                                   @RequestPart("file") Mono<FilePart> filePartMono) {
+	public ResponseEntity<Mono<AwesomeStorageInfoResponse>> uploadFile(@PathVariable String storageId,
+	                                                                   @RequestPart("file") Mono<FilePart> filePartMono) {
 		String userId = "";
-		return null;
+		return ResponseEntity.ok(filePartMono.flatMap(filePart -> storageService.saveStorage(userId, storageId, filePart))
+		                                     .map(AwesomeStorageInfoResponse::of));
 	}
 
 	@DeleteMapping("/{storageId}")
 	public ResponseEntity<Mono<Boolean>> deleteStorage(@PathVariable String storageId) {
 		String userId = "";
-		return null;
+		return ResponseEntity.ok(storageService.removeStorageByStorageId(userId, storageId));
 	}
 }

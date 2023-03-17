@@ -35,13 +35,21 @@ public class AwesomeStorage {
 		return makeFolder(userId, null, "root::" + userId);
 	}
 
+	public static AwesomeStorage makeFile(String userId, String parentStorageId, String fileName, long fileSize) {
+		return makeStorage(userId, parentStorageId, fileName, fileSize, StorageExtType.FILE);
+	}
+
 	public static AwesomeStorage makeFolder(String userId, String parentStorageId, String folderName) {
+		return makeStorage(userId, parentStorageId, folderName, 0, StorageExtType.FOLDER);
+	}
+
+	public static AwesomeStorage makeStorage(String userId, String parentStorageId, String fileName, long fileSize, StorageExtType extType) {
 		AwesomeStorage awesomeStorage = new AwesomeStorage();
 		awesomeStorage.setUserId(userId);
 		awesomeStorage.setParentStorageId(parentStorageId);
-		awesomeStorage.setStorageName(folderName);
-		awesomeStorage.setStorageFileSize(0);
-		awesomeStorage.setExtType(StorageExtType.FOLDER);
+		awesomeStorage.setStorageName(fileName);
+		awesomeStorage.setStorageFileSize(fileSize);
+		awesomeStorage.setExtType(extType);
 
 		OffsetDateTime now = OffsetDateTime.now();
 		awesomeStorage.setCreatedAt(now);

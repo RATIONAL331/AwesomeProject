@@ -10,10 +10,6 @@ public interface AwesomeStorageService {
 
 	Flux<AwesomeStorageDto> getStorageByParentStorageId(String userId, String parentStorageId);
 
-	Flux<AwesomeStorageDto> getStorageByUserId(String userId);
-
-	Flux<AwesomeStorageDto> getStorageByUsername(String username);
-
 	Mono<AwesomeStorageDto> getRootStorageByUserId(String userId);
 
 	Mono<AwesomeStorageDto> makeFolder(String userId, String parentStorageId, String folderName);

@@ -14,11 +14,11 @@ public class ObjectFileStorageServiceImpl implements FileStorageService {
 
 	@Override
 	public Mono<Boolean> upload(String fileId, FilePart filePart) {
-		return Mono.empty();
+		return Mono.just(true);
 	}
 
 	@Override
 	public Mono<Boolean> delete(String fileId) {
-		return Mono.empty();
+		return Mono.just(true);
 	}
 }

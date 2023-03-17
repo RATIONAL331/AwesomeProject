@@ -25,29 +25,13 @@ public class AwesomeStorageServiceImpl implements AwesomeStorageService {
 
 	@Override
 	public Mono<AwesomeStorageDto> getStorageById(String userId, String storageId) {
-		return storageReactiveRepository.findById(storageId)
-		                                .filter(storage -> userId.equals(storage.getUserId()))
-		                                .map(AwesomeStorageDto::of);
+		return getAwesomeStorageByUserId(userId, storageId).map(AwesomeStorageDto::of);
 	}
 
 	@Override
 	public Flux<AwesomeStorageDto> getStorageByParentStorageId(String userId, String parentStorageId) {
-		return storageReactiveRepository.findAllByParentStorageIdAndDeletedAtIsNull(parentStorageId)
-		                                .filter(storage -> userId.equals(storage.getUserId()))
-		                                .map(AwesomeStorageDto::of);
-	}
-
-	@Override
-	public Flux<AwesomeStorageDto> getStorageByUserId(String userId) {
-		return storageReactiveRepository.findAllByUserIdAndDeletedAtIsNull(userId)
-		                                .map(AwesomeStorageDto::of);
-	}
-
-	@Override
-	public Flux<AwesomeStorageDto> getStorageByUsername(String username) {
-		return userReactiveRepository.findByUsername(username)
-		                             .flatMapMany(user -> storageReactiveRepository.findAllByUserIdAndDeletedAtIsNull(user.getId()))
-		                             .map(AwesomeStorageDto::of);
+		return getAwesomeStorageByUserId(userId, parentStorageId).flatMapMany(storage -> storageReactiveRepository.findAllByParentStorageIdAndDeletedAtIsNull(storage.getId()))
+		                                                         .map(AwesomeStorageDto::of);
 	}
 
 	@Override
@@ -69,32 +53,36 @@ public class AwesomeStorageServiceImpl implements AwesomeStorageService {
 	@Override
 	@Transactional
 	public Mono<AwesomeStorageDto> saveStorage(String userId, String parentStorageId, FilePart filePart) {
-		/**
-		 * todo
-		 * 1. upload object storage
-		 * 2. save file info
-		 * 3. recalculate storage size
-		 */
-		return null;
+		return alreadyExistStorageNameInParentStorage(userId, parentStorageId, filePart.filename(), StorageExtType.FILE)
+				.filter(bool -> !bool)
+				// 1. save file info
+				.flatMap(bool -> storageReactiveRepository.save(AwesomeStorage.makeFile(userId, parentStorageId, filePart.filename(), filePart.headers().getContentLength())))
+				// 2. upload object storage
+				.flatMap(storage -> fileStorageService.upload(storage.getId(), filePart)
+				                                      // 3. recalculate size
+				                                      .flatMap(bool -> recalculateSize(storage)))
+				.map(AwesomeStorageDto::of);
 	}
 
 	@Override
 	@Transactional
 	public Mono<Boolean> removeStorageByStorageId(String userId, String storageId) {
+		return getAwesomeStorageByUserId(userId, storageId).flatMap(this::removeStorage)
+		                                                   .flatMap(this::recalculateSize)
+		                                                   .flatMap(storage -> fileStorageService.delete(storage.getId()));
+	}
+
+	private Mono<AwesomeStorage> getAwesomeStorageByUserId(String userId, String storageId) {
 		return storageReactiveRepository.findByIdAndUserId(storageId, userId)
-		                                .switchIfEmpty(Mono.defer(() -> Mono.error(new RuntimeException("Not Exist File/Folder"))))
-		                                .flatMap(this::removeStorage)
-		                                .flatMap(this::recalculateSize)
-		                                .flatMap(storage -> fileStorageService.delete(storage.getId()));
+		                                .switchIfEmpty(Mono.defer(() -> Mono.error(new RuntimeException("Not Exist File/Folder"))));
 	}
 
 	private Mono<Boolean> alreadyExistStorageNameInParentStorage(String userId, String parentStorageId, String storageName, StorageExtType extType) {
-		return storageReactiveRepository.findByIdAndUserId(parentStorageId, userId)
-		                                .switchIfEmpty(Mono.defer(() -> Mono.error(new RuntimeException("Not Exist File/Folder"))))
-		                                .flatMapMany(storage -> storageReactiveRepository.findAllByParentStorageIdAndDeletedAtIsNull(storage.getId()))
-		                                .filter(storage -> extType.equals(storage.getExtType()))
-		                                .filter(storage -> storage.getStorageName().equals(storageName))
-		                                .hasElements();
+		return getAwesomeStorageByUserId(userId, parentStorageId)
+				.flatMapMany(storage -> storageReactiveRepository.findAllByParentStorageIdAndDeletedAtIsNull(storage.getId()))
+				.filter(storage -> extType.equals(storage.getExtType()))
+				.filter(storage -> storage.getStorageName().equals(storageName))
+				.hasElements();
 	}
 
 	private Mono<AwesomeStorage> removeStorage(AwesomeStorage awesomeStorage) {
