@@ -1,6 +1,5 @@
 package com.rational.awesomeproject.config;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
@@ -11,7 +10,6 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 
 @Configuration
 @EnableWebFluxSecurity
-@RequiredArgsConstructor
 public class SecurityConfig {
 	@Bean
 	public PasswordEncoder passwordEncoder() {
@@ -22,7 +20,7 @@ public class SecurityConfig {
 	public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
 		http.authorizeExchange()
 		    .pathMatchers("/create-user").permitAll()
-		    .anyExchange().authenticated()
+		    .anyExchange().permitAll()
 		    .and()
 		    .csrf().disable()
 		    .cors().disable()

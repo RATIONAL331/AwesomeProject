@@ -20,7 +20,7 @@ import java.util.Arrays;
 public class MongoRepositoryConfig extends AbstractReactiveMongoConfiguration {
 	@Bean
 	public MongoClient mongoClient() {
-		return MongoClients.create("mongodb://localhost:27017");
+		return MongoClients.create("mongodb://localhost:27017,localhost:27017/awesome?replicaSet=rs0");
 	}
 
 	@Bean

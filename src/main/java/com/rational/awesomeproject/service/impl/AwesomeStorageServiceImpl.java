@@ -53,11 +53,14 @@ public class AwesomeStorageServiceImpl implements AwesomeStorageService {
 	@Override
 	@Transactional
 	public Mono<AwesomeStorageDto> saveStorage(String userId, String parentStorageId, FilePart filePart) {
+
 		return alreadyExistStorageNameInParentStorage(userId, parentStorageId, filePart.filename(), StorageExtType.FILE)
 				.filter(bool -> !bool)
-				// 1. save file info
-				.flatMap(bool -> storageReactiveRepository.save(AwesomeStorage.makeFile(userId, parentStorageId, filePart.filename(), filePart.headers().getContentLength())))
-				// 2. upload object storage
+				// 1. read file size
+				.flatMap(bool -> filePart.content().reduce(0L, (size, buffer) -> size + buffer.readableByteCount()))
+				// 2. save storage
+				.flatMap(fileSize -> storageReactiveRepository.save(AwesomeStorage.makeFile(userId, parentStorageId, filePart.filename(), fileSize)))
+				// 3. upload object storage
 				.flatMap(storage -> fileStorageService.upload(storage.getId(), filePart)
 				                                      // 3. recalculate size
 				                                      .flatMap(bool -> recalculateSize(storage)))
@@ -67,7 +70,9 @@ public class AwesomeStorageServiceImpl implements AwesomeStorageService {
 	@Override
 	@Transactional
 	public Mono<Boolean> removeStorageByStorageId(String userId, String storageId) {
-		return getAwesomeStorageByUserId(userId, storageId).flatMap(this::removeStorage)
+		// when try to remove root folder => filtering
+		return getAwesomeStorageByUserId(userId, storageId).filter(storage -> storage.getParentStorageId() != null)
+		                                                   .flatMap(this::removeStorage)
 		                                                   .flatMap(this::recalculateSize)
 		                                                   .flatMap(storage -> fileStorageService.delete(storage.getId()));
 	}

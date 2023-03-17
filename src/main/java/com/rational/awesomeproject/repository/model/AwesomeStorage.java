@@ -54,7 +54,6 @@ public class AwesomeStorage {
 		OffsetDateTime now = OffsetDateTime.now();
 		awesomeStorage.setCreatedAt(now);
 		awesomeStorage.setUpdatedAt(now);
-		awesomeStorage.setCreatedAt(null);
 		return awesomeStorage;
 	}
 }

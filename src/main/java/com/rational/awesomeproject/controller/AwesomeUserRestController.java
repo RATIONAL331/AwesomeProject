@@ -20,7 +20,7 @@ public class AwesomeUserRestController {
 
 	@GetMapping("/user-info")
 	public ResponseEntity<Mono<AwesomeUserInfoResponse>> getUserInfo() {
-		String userId = "";
+		String userId = "64148875c91155110d5694db";
 		Mono<AwesomeUserDto> awesomeUserMono = userService.getUserByUserId(userId);
 		Mono<AwesomeStorageDto> awesomeStorageMono = storageService.getRootStorageByUserId(userId);
 

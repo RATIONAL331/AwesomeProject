@@ -17,14 +17,14 @@ public class AwesomeStorageRestController {
 
 	@GetMapping("/{storageId}")
 	public ResponseEntity<Mono<AwesomeStorageInfoResponse>> getStorage(@PathVariable String storageId) {
-		String userId = "";
+		String userId = "64148875c91155110d5694db";
 		return ResponseEntity.ok(storageService.getStorageById(userId, storageId)
 		                                       .map(AwesomeStorageInfoResponse::of));
 	}
 
 	@GetMapping("/{storageId}/hierarchy")
 	public ResponseEntity<Flux<AwesomeStorageInfoResponse>> getStorageHierarchy(@PathVariable String storageId) {
-		String userId = "";
+		String userId = "64148875c91155110d5694db";
 		return ResponseEntity.ok(storageService.getStorageByParentStorageId(userId, storageId)
 		                                       .map(AwesomeStorageInfoResponse::of));
 	}
@@ -32,7 +32,7 @@ public class AwesomeStorageRestController {
 	@PostMapping("/new-folder/{storageId}/{folderName}")
 	public ResponseEntity<Mono<AwesomeStorageInfoResponse>> makeFolder(@PathVariable String storageId,
 	                                                                   @PathVariable String folderName) {
-		String userId = "";
+		String userId = "64148875c91155110d5694db";
 		return ResponseEntity.ok(storageService.makeFolder(userId, storageId, folderName)
 		                                       .map(AwesomeStorageInfoResponse::of));
 	}
@@ -40,14 +40,14 @@ public class AwesomeStorageRestController {
 	@PostMapping("/{storageId}/upload")
 	public ResponseEntity<Mono<AwesomeStorageInfoResponse>> uploadFile(@PathVariable String storageId,
 	                                                                   @RequestPart("file") Mono<FilePart> filePartMono) {
-		String userId = "";
+		String userId = "64148875c91155110d5694db";
 		return ResponseEntity.ok(filePartMono.flatMap(filePart -> storageService.saveStorage(userId, storageId, filePart))
 		                                     .map(AwesomeStorageInfoResponse::of));
 	}
 
 	@DeleteMapping("/{storageId}")
 	public ResponseEntity<Mono<Boolean>> deleteStorage(@PathVariable String storageId) {
-		String userId = "";
+		String userId = "64148875c91155110d5694db";
 		return ResponseEntity.ok(storageService.removeStorageByStorageId(userId, storageId));
 	}
 }
