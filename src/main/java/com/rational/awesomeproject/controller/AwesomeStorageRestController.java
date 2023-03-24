@@ -1,10 +1,11 @@
 package com.rational.awesomeproject.controller;
 
 import com.rational.awesomeproject.controller.dto.AwesomeStorageInfoResponse;
+import com.rational.awesomeproject.repository.model.AwesomeUser;
 import com.rational.awesomeproject.service.AwesomeStorageService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.multipart.FilePart;
+import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -16,38 +17,53 @@ public class AwesomeStorageRestController {
 	private final AwesomeStorageService storageService;
 
 	@GetMapping("/{storageId}")
-	public ResponseEntity<Mono<AwesomeStorageInfoResponse>> getStorage(@PathVariable String storageId) {
-		String userId = "64148875c91155110d5694db";
-		return ResponseEntity.ok(storageService.getStorageById(userId, storageId)
-		                                       .map(AwesomeStorageInfoResponse::of));
+	public Mono<AwesomeStorageInfoResponse> getStorage(@PathVariable String storageId) {
+		return ReactiveSecurityContextHolder.getContext()
+		                                    .map(securityContext -> securityContext.getAuthentication().getPrincipal())
+		                                    .cast(AwesomeUser.class)
+		                                    .map(AwesomeUser::getId)
+		                                    .flatMap(userId -> storageService.getStorageById(userId, storageId))
+		                                    .map(AwesomeStorageInfoResponse::of);
 	}
 
 	@PostMapping("/{storageId}")
-	public ResponseEntity<Mono<AwesomeStorageInfoResponse>> uploadFile(@PathVariable String storageId,
-	                                                                   @RequestPart("file") Mono<FilePart> filePartMono) {
-		String userId = "64148875c91155110d5694db";
-		return ResponseEntity.ok(filePartMono.flatMap(filePart -> storageService.saveStorage(userId, storageId, filePart))
-		                                     .map(AwesomeStorageInfoResponse::of));
+	public Mono<AwesomeStorageInfoResponse> uploadFile(@PathVariable String storageId,
+	                                                   @RequestPart("file") Mono<FilePart> filePartMono) {
+		return ReactiveSecurityContextHolder.getContext()
+		                                    .map(securityContext -> securityContext.getAuthentication().getPrincipal())
+		                                    .cast(AwesomeUser.class)
+		                                    .map(AwesomeUser::getId)
+		                                    .flatMap(userId -> filePartMono.flatMap(filePart -> storageService.saveStorage(userId, storageId, filePart)))
+		                                    .map(AwesomeStorageInfoResponse::of);
 	}
 
 	@DeleteMapping("/{storageId}")
-	public ResponseEntity<Mono<Boolean>> deleteStorage(@PathVariable String storageId) {
-		String userId = "64148875c91155110d5694db";
-		return ResponseEntity.ok(storageService.removeStorageByStorageId(userId, storageId));
+	public Mono<Boolean> deleteStorage(@PathVariable String storageId) {
+		return ReactiveSecurityContextHolder.getContext()
+		                                    .map(securityContext -> securityContext.getAuthentication().getPrincipal())
+		                                    .cast(AwesomeUser.class)
+		                                    .map(AwesomeUser::getId)
+		                                    .flatMap(userId -> storageService.removeStorageByStorageId(userId, storageId));
 	}
 
 	@GetMapping("/{storageId}/hierarchy")
-	public ResponseEntity<Flux<AwesomeStorageInfoResponse>> getStorageHierarchy(@PathVariable String storageId) {
-		String userId = "64148875c91155110d5694db";
-		return ResponseEntity.ok(storageService.getStorageByParentStorageId(userId, storageId)
-		                                       .map(AwesomeStorageInfoResponse::of));
+	public Flux<AwesomeStorageInfoResponse> getStorageHierarchy(@PathVariable String storageId) {
+		return ReactiveSecurityContextHolder.getContext()
+		                                    .map(securityContext -> securityContext.getAuthentication().getPrincipal())
+		                                    .cast(AwesomeUser.class)
+		                                    .map(AwesomeUser::getId)
+		                                    .flatMapMany(userId -> storageService.getStorageByParentStorageId(userId, storageId))
+		                                    .map(AwesomeStorageInfoResponse::of);
 	}
 
 	@PostMapping("/new-folder/{storageId}/{folderName}")
-	public ResponseEntity<Mono<AwesomeStorageInfoResponse>> makeFolder(@PathVariable String storageId,
-	                                                                   @PathVariable String folderName) {
-		String userId = "64148875c91155110d5694db";
-		return ResponseEntity.ok(storageService.makeFolder(userId, storageId, folderName)
-		                                       .map(AwesomeStorageInfoResponse::of));
+	public Mono<AwesomeStorageInfoResponse> makeFolder(@PathVariable String storageId,
+	                                                   @PathVariable String folderName) {
+		return ReactiveSecurityContextHolder.getContext()
+		                                    .map(securityContext -> securityContext.getAuthentication().getPrincipal())
+		                                    .cast(AwesomeUser.class)
+		                                    .map(AwesomeUser::getId)
+		                                    .flatMap(userId -> storageService.makeFolder(userId, storageId, folderName))
+		                                    .map(AwesomeStorageInfoResponse::of);
 	}
 }

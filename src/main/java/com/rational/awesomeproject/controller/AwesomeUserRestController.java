@@ -1,14 +1,14 @@
 package com.rational.awesomeproject.controller;
 
 import com.rational.awesomeproject.controller.dto.AwesomeUserInfoResponse;
-import com.rational.awesomeproject.controller.dto.CreateUserRequest;
+import com.rational.awesomeproject.repository.model.AwesomeUser;
 import com.rational.awesomeproject.service.AwesomeStorageService;
 import com.rational.awesomeproject.service.AwesomeUserService;
-import com.rational.awesomeproject.service.dto.AwesomeStorageDto;
-import com.rational.awesomeproject.service.dto.AwesomeUserDto;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.context.ReactiveSecurityContextHolder;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -19,20 +19,12 @@ public class AwesomeUserRestController {
 	private final AwesomeStorageService storageService;
 
 	@GetMapping("/user-info")
-	public ResponseEntity<Mono<AwesomeUserInfoResponse>> getUserInfo() {
-		String userId = "64148875c91155110d5694db";
-		Mono<AwesomeUserDto> awesomeUserMono = userService.getUserByUserId(userId);
-		Mono<AwesomeStorageDto> awesomeStorageMono = storageService.getRootStorageByUserId(userId);
-
-		return ResponseEntity.ok(Mono.zip(awesomeUserMono, awesomeStorageMono)
-		                             .map(tuple -> AwesomeUserInfoResponse.of(tuple.getT1(), tuple.getT2())));
-	}
-
-	@PostMapping("/create-user")
-	public ResponseEntity<Mono<AwesomeUserInfoResponse>> createUser(@RequestBody Mono<CreateUserRequest> request) {
-		Mono<AwesomeUserDto> awesomeUserMono = request.flatMap(req -> userService.createUser(req.getUsername(), req.getPassword()));
-
-		return ResponseEntity.ok(awesomeUserMono.zipWhen(user -> storageService.getRootStorageByUserId(user.getId()))
-		                                        .map(tuple -> AwesomeUserInfoResponse.of(tuple.getT1(), tuple.getT2())));
+	public Mono<AwesomeUserInfoResponse> getUserInfo() {
+		return ReactiveSecurityContextHolder.getContext()
+		                                    .map(securityContext -> securityContext.getAuthentication().getPrincipal())
+		                                    .cast(AwesomeUser.class)
+		                                    .map(AwesomeUser::getId)
+		                                    .flatMap(id -> Mono.zip(userService.getUserByUserId(id), storageService.getRootStorageByUserId(id)))
+		                                    .map(tuple -> AwesomeUserInfoResponse.of(tuple.getT1(), tuple.getT2()));
 	}
 }
