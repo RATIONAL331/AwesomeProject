@@ -62,7 +62,7 @@ public class AwesomeStorageServiceImpl implements AwesomeStorageService {
 				.flatMap(fileSize -> storageReactiveRepository.save(AwesomeStorage.makeFile(userId, parentStorageId, filePart.filename(), fileSize)))
 				// 3. upload object storage
 				.flatMap(storage -> fileStorageService.upload(storage.getId(), filePart)
-				                                      // 3. recalculate size
+				                                      // 4. recalculate size
 				                                      .flatMap(bool -> recalculateSize(storage)))
 				.map(AwesomeStorageDto::of);
 	}
@@ -92,22 +92,38 @@ public class AwesomeStorageServiceImpl implements AwesomeStorageService {
 
 	private Mono<AwesomeStorage> removeStorage(AwesomeStorage awesomeStorage) {
 		awesomeStorage.setDeletedAt(OffsetDateTime.now());
+		// if storage is folder, remove all child folder and file
 		if (awesomeStorage.getExtType() == StorageExtType.FOLDER) {
 			return storageReactiveRepository.findAllByParentStorageIdAndDeletedAtIsNull(awesomeStorage.getId())
 			                                .flatMap(this::removeStorage)
 			                                .then(storageReactiveRepository.save(awesomeStorage));
 		}
+
+		// if storage is file, just remove
 		return storageReactiveRepository.save(awesomeStorage);
 	}
 
 	private Mono<AwesomeStorage> recalculateSize(AwesomeStorage awesomeStorage) {
-		Mono<AwesomeStorage> parentStorage = storageReactiveRepository.findById(awesomeStorage.getParentStorageId());
-		return storageReactiveRepository.findAllByParentStorageIdAndDeletedAtIsNull(awesomeStorage.getParentStorageId())
+		// if root folder calculate itself
+		if (awesomeStorage.getParentStorageId() == null) {
+			return calculateStorage(awesomeStorage.getId(), awesomeStorage);
+		}
+
+		// if not root folder calculate parent folder and recursion
+		return storageReactiveRepository.findById(awesomeStorage.getParentStorageId())
+		                                .flatMap(parentStorage -> calculateStorage(parentStorage.getId(), parentStorage))
+		                                .flatMap(this::recalculateSize)
+		                                // then return original storage
+		                                .thenReturn(awesomeStorage);
+	}
+
+	private Mono<AwesomeStorage> calculateStorage(String storageId, AwesomeStorage storage) {
+		return storageReactiveRepository.findAllByParentStorageIdAndDeletedAtIsNull(storageId)
 		                                .map(AwesomeStorage::getStorageFileSize)
 		                                .reduce(0L, Long::sum)
-		                                .flatMap(totalSize -> parentStorage.flatMap(storage -> {
+		                                .flatMap(totalSize -> {
 			                                storage.setStorageFileSize(totalSize);
 			                                return storageReactiveRepository.save(storage);
-		                                }));
+		                                });
 	}
 }

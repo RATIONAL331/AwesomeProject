@@ -14,6 +14,7 @@ import java.time.OffsetDateTime;
 public class AwesomeUserInfoResponse {
 	private String id;
 	private String username;
+	private String rootStorageId;
 	private long storageFileSize;
 	private OffsetDateTime createdAt;
 	private OffsetDateTime updatedAt;
@@ -23,6 +24,7 @@ public class AwesomeUserInfoResponse {
 		return AwesomeUserInfoResponse.builder()
 		                              .id(userDto.getId())
 		                              .username(userDto.getUsername())
+		                              .rootStorageId(userDto.getRootStorageId())
 		                              .storageFileSize(storageDto.getStorageFileSize())
 		                              .createdAt(userDto.getCreatedAt())
 		                              .updatedAt(userDto.getUpdatedAt())
