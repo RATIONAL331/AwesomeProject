@@ -5,10 +5,11 @@ import com.rational.awesomeproject.controller.dto.CreateUserRequest;
 import com.rational.awesomeproject.controller.dto.LoginRequest;
 import com.rational.awesomeproject.controller.dto.LoginResponse;
 import com.rational.awesomeproject.service.auth.AuthService;
-import com.rational.awesomeproject.service.auth.dto.CustomUserPrincipal;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -25,12 +26,5 @@ public class AwesomeAuthRestController {
 	@PostMapping("/login")
 	public Mono<LoginResponse> login(@RequestBody Mono<LoginRequest> loginRequest) {
 		return loginRequest.flatMap(authService::login);
-	}
-
-	@GetMapping("/test")
-	public Mono<String> test(@AuthenticationPrincipal CustomUserPrincipal customUserPrincipal) {
-		System.out.println(customUserPrincipal.getUser().getUsername());
-		System.out.println(customUserPrincipal.getUser().getId());
-		return Mono.just("test");
 	}
 }

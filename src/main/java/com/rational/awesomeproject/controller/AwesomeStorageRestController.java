@@ -1,11 +1,11 @@
 package com.rational.awesomeproject.controller;
 
 import com.rational.awesomeproject.controller.dto.AwesomeStorageInfoResponse;
-import com.rational.awesomeproject.repository.model.AwesomeUser;
 import com.rational.awesomeproject.service.AwesomeStorageService;
+import com.rational.awesomeproject.service.auth.dto.CustomUserPrincipal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.codec.multipart.FilePart;
-import org.springframework.security.core.context.ReactiveSecurityContextHolder;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -17,53 +17,43 @@ public class AwesomeStorageRestController {
 	private final AwesomeStorageService storageService;
 
 	@GetMapping("/{storageId}")
-	public Mono<AwesomeStorageInfoResponse> getStorage(@PathVariable String storageId) {
-		return ReactiveSecurityContextHolder.getContext()
-		                                    .map(securityContext -> securityContext.getAuthentication().getPrincipal())
-		                                    .cast(AwesomeUser.class)
-		                                    .map(AwesomeUser::getId)
-		                                    .flatMap(userId -> storageService.getStorageById(userId, storageId))
-		                                    .map(AwesomeStorageInfoResponse::of);
+	public Mono<AwesomeStorageInfoResponse> getStorage(@AuthenticationPrincipal CustomUserPrincipal customUserPrincipal,
+	                                                   @PathVariable String storageId) {
+		String userId = customUserPrincipal.getUser().getId();
+		return storageService.getStorageById(userId, storageId)
+		                     .map(AwesomeStorageInfoResponse::of);
 	}
 
 	@PostMapping("/{storageId}")
-	public Mono<AwesomeStorageInfoResponse> uploadFile(@PathVariable String storageId,
+	public Mono<AwesomeStorageInfoResponse> uploadFile(@AuthenticationPrincipal CustomUserPrincipal customUserPrincipal,
+	                                                   @PathVariable String storageId,
 	                                                   @RequestPart("file") Mono<FilePart> filePartMono) {
-		return ReactiveSecurityContextHolder.getContext()
-		                                    .map(securityContext -> securityContext.getAuthentication().getPrincipal())
-		                                    .cast(AwesomeUser.class)
-		                                    .map(AwesomeUser::getId)
-		                                    .flatMap(userId -> filePartMono.flatMap(filePart -> storageService.saveStorage(userId, storageId, filePart)))
-		                                    .map(AwesomeStorageInfoResponse::of);
+		String userId = customUserPrincipal.getUser().getId();
+		return filePartMono.flatMap(filePart -> storageService.saveStorage(userId, storageId, filePart))
+		                   .map(AwesomeStorageInfoResponse::of);
 	}
 
 	@DeleteMapping("/{storageId}")
-	public Mono<Boolean> deleteStorage(@PathVariable String storageId) {
-		return ReactiveSecurityContextHolder.getContext()
-		                                    .map(securityContext -> securityContext.getAuthentication().getPrincipal())
-		                                    .cast(AwesomeUser.class)
-		                                    .map(AwesomeUser::getId)
-		                                    .flatMap(userId -> storageService.removeStorageByStorageId(userId, storageId));
+	public Mono<Boolean> deleteStorage(@AuthenticationPrincipal CustomUserPrincipal customUserPrincipal,
+	                                   @PathVariable String storageId) {
+		String userId = customUserPrincipal.getUser().getId();
+		return storageService.removeStorageByStorageId(userId, storageId);
 	}
 
 	@GetMapping("/{storageId}/hierarchy")
-	public Flux<AwesomeStorageInfoResponse> getStorageHierarchy(@PathVariable String storageId) {
-		return ReactiveSecurityContextHolder.getContext()
-		                                    .map(securityContext -> securityContext.getAuthentication().getPrincipal())
-		                                    .cast(AwesomeUser.class)
-		                                    .map(AwesomeUser::getId)
-		                                    .flatMapMany(userId -> storageService.getStorageByParentStorageId(userId, storageId))
-		                                    .map(AwesomeStorageInfoResponse::of);
+	public Flux<AwesomeStorageInfoResponse> getStorageHierarchy(@AuthenticationPrincipal CustomUserPrincipal customUserPrincipal,
+	                                                            @PathVariable String storageId) {
+		String userId = customUserPrincipal.getUser().getId();
+		return storageService.getStorageByParentStorageId(userId, storageId)
+		                     .map(AwesomeStorageInfoResponse::of);
 	}
 
 	@PostMapping("/new-folder/{storageId}/{folderName}")
-	public Mono<AwesomeStorageInfoResponse> makeFolder(@PathVariable String storageId,
+	public Mono<AwesomeStorageInfoResponse> makeFolder(@AuthenticationPrincipal CustomUserPrincipal customUserPrincipal,
+	                                                   @PathVariable String storageId,
 	                                                   @PathVariable String folderName) {
-		return ReactiveSecurityContextHolder.getContext()
-		                                    .map(securityContext -> securityContext.getAuthentication().getPrincipal())
-		                                    .cast(AwesomeUser.class)
-		                                    .map(AwesomeUser::getId)
-		                                    .flatMap(userId -> storageService.makeFolder(userId, storageId, folderName))
-		                                    .map(AwesomeStorageInfoResponse::of);
+		String userId = customUserPrincipal.getUser().getId();
+		return storageService.makeFolder(userId, storageId, folderName)
+		                     .map(AwesomeStorageInfoResponse::of);
 	}
 }
