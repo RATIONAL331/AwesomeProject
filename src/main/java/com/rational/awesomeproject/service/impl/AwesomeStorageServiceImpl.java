@@ -8,11 +8,15 @@ import com.rational.awesomeproject.service.AwesomeStorageService;
 import com.rational.awesomeproject.service.FileStorageService;
 import com.rational.awesomeproject.service.dto.AwesomeStorageDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.util.function.Tuple2;
 
 import java.time.OffsetDateTime;
 
@@ -51,6 +55,15 @@ public class AwesomeStorageServiceImpl implements AwesomeStorageService {
 	}
 
 	@Override
+	public Mono<Tuple2<AwesomeStorage, Resource>> downloadStorage(String userId, String storageId) {
+		Mono<AwesomeStorage> storage = storageReactiveRepository.findByIdAndUserId(storageId, userId)
+		                                                        .switchIfEmpty(Mono.defer(() -> Mono.error(new RuntimeException("Not Exist File/Folder"))));
+		Mono<InputStreamResource> file = DataBufferUtils.join(fileStorageService.download(userId, storageId))
+		                                                .map(dataBuffer -> new InputStreamResource(dataBuffer.asInputStream()));
+		return Mono.zip(storage, file);
+	}
+
+	@Override
 	@Transactional
 	public Mono<AwesomeStorageDto> saveStorage(String userId, String parentStorageId, FilePart filePart) {
 
@@ -61,7 +74,7 @@ public class AwesomeStorageServiceImpl implements AwesomeStorageService {
 				// 2. save storage
 				.flatMap(fileSize -> storageReactiveRepository.save(AwesomeStorage.makeFile(userId, parentStorageId, filePart.filename(), fileSize)))
 				// 3. upload object storage
-				.flatMap(storage -> fileStorageService.upload(storage.getId(), filePart)
+				.flatMap(storage -> fileStorageService.upload(userId, storage.getId(), storage.getStorageName(), storage.getStorageFileSize(), filePart)
 				                                      // 4. recalculate size
 				                                      .flatMap(bool -> recalculateSize(storage)))
 				.map(AwesomeStorageDto::of);
@@ -74,7 +87,7 @@ public class AwesomeStorageServiceImpl implements AwesomeStorageService {
 		return getAwesomeStorageByUserId(userId, storageId).filter(storage -> storage.getParentStorageId() != null)
 		                                                   .flatMap(this::removeStorage)
 		                                                   .flatMap(this::recalculateSize)
-		                                                   .flatMap(storage -> fileStorageService.delete(storage.getId()));
+		                                                   .flatMap(storage -> fileStorageService.delete(userId, storage.getId()));
 	}
 
 	private Mono<AwesomeStorage> getAwesomeStorageByUserId(String userId, String storageId) {

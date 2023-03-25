@@ -8,6 +8,7 @@ class AwesomeProjectApplicationTests {
 
 	@Test
 	void contextLoads() {
+
 	}
 
 }
