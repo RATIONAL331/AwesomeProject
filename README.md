@@ -185,6 +185,8 @@
 
 `POST /storage/new-folder/{storageId}/{folderName}`
 
+* `storageId`의 해당하는 storage에 `folderName`라는 이름으로 새롭게 폴더를 추가합니다.
+
 #### Request Header
 
 * `Authorization: {ACCESS_TOKEN}`
