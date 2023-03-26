@@ -7,7 +7,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -25,11 +25,11 @@ public class AwesomeStorage {
 	private StorageExtType extType;
 
 	@CreatedDate
-	private OffsetDateTime createdAt;
+	private LocalDateTime createdAt;
 
 	@LastModifiedDate
-	private OffsetDateTime updatedAt;
-	private OffsetDateTime deletedAt;
+	private LocalDateTime updatedAt;
+	private LocalDateTime deletedAt;
 
 	public static AwesomeStorage makeDefault(String userId) {
 		return makeFolder(userId, null, "root::" + userId);
@@ -51,7 +51,7 @@ public class AwesomeStorage {
 		awesomeStorage.setStorageFileSize(fileSize);
 		awesomeStorage.setExtType(extType);
 
-		OffsetDateTime now = OffsetDateTime.now();
+		LocalDateTime now = LocalDateTime.now();
 		awesomeStorage.setCreatedAt(now);
 		awesomeStorage.setUpdatedAt(now);
 		return awesomeStorage;

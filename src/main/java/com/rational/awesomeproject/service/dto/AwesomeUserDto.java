@@ -3,7 +3,7 @@ package com.rational.awesomeproject.service.dto;
 import com.rational.awesomeproject.repository.model.AwesomeUser;
 import lombok.*;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -14,8 +14,8 @@ public class AwesomeUserDto {
 	private String id;
 	private String username;
 	private String rootStorageId;
-	private OffsetDateTime createdAt;
-	private OffsetDateTime updatedAt;
+	private LocalDateTime createdAt;
+	private LocalDateTime updatedAt;
 
 	public static AwesomeUserDto of(AwesomeUser awesomeUser) {
 		return AwesomeUserDto.builder()

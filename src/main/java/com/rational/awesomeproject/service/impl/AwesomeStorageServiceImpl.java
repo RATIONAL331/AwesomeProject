@@ -18,7 +18,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -104,7 +104,7 @@ public class AwesomeStorageServiceImpl implements AwesomeStorageService {
 	}
 
 	private Mono<AwesomeStorage> removeStorage(String userId, AwesomeStorage awesomeStorage) {
-		awesomeStorage.setDeletedAt(OffsetDateTime.now());
+		awesomeStorage.setDeletedAt(LocalDateTime.now());
 		// if storage is folder, remove all child folder and file
 		if (awesomeStorage.getExtType() == StorageExtType.FOLDER) {
 			return storageReactiveRepository.findAllByParentStorageIdAndDeletedAtIsNull(awesomeStorage.getId())

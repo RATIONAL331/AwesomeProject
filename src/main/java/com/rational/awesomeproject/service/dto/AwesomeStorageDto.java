@@ -4,7 +4,7 @@ import com.rational.awesomeproject.common.enums.StorageExtType;
 import com.rational.awesomeproject.repository.model.AwesomeStorage;
 import lombok.*;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -18,9 +18,9 @@ public class AwesomeStorageDto {
 	private String storageName;
 	private long storageFileSize;
 	private StorageExtType extType;
-	private OffsetDateTime createdAt;
-	private OffsetDateTime updatedAt;
-	private OffsetDateTime deletedAt;
+	private LocalDateTime createdAt;
+	private LocalDateTime updatedAt;
+	private LocalDateTime deletedAt;
 
 	public static AwesomeStorageDto of(AwesomeStorage awesomeStorage) {
 		return AwesomeStorageDto.builder()

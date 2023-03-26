@@ -9,7 +9,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -29,10 +29,10 @@ public class AwesomeUser implements UserDetails {
 	private String rootStorageId;
 
 	@CreatedDate
-	private OffsetDateTime createdAt;
+	private LocalDateTime createdAt;
 
 	@LastModifiedDate
-	private OffsetDateTime updatedAt;
+	private LocalDateTime updatedAt;
 
 	private String password;
 	private boolean accountNonExpired;
@@ -52,7 +52,7 @@ public class AwesomeUser implements UserDetails {
 		awesomeUser.setCredentialsNonExpired(true);
 		awesomeUser.setPermissions(Collections.emptyList());
 
-		OffsetDateTime now = OffsetDateTime.now();
+		LocalDateTime now = LocalDateTime.now();
 		awesomeUser.setCreatedAt(now);
 		awesomeUser.setUpdatedAt(now);
 		return awesomeUser;

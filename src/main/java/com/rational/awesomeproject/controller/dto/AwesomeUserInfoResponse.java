@@ -4,7 +4,7 @@ import com.rational.awesomeproject.service.dto.AwesomeStorageDto;
 import com.rational.awesomeproject.service.dto.AwesomeUserDto;
 import lombok.*;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -16,8 +16,8 @@ public class AwesomeUserInfoResponse {
 	private String username;
 	private String rootStorageId;
 	private long storageFileSize;
-	private OffsetDateTime createdAt;
-	private OffsetDateTime updatedAt;
+	private LocalDateTime createdAt;
+	private LocalDateTime updatedAt;
 
 	public static AwesomeUserInfoResponse of(AwesomeUserDto userDto,
 	                                         AwesomeStorageDto storageDto) {
