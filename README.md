@@ -290,6 +290,25 @@ true
 * CI/CD는 `110.165.16.112:8080` 젠킨스쪽에서 이루어짐
 * main 브랜치에 푸시가 발생하면 배포까지 자동으로 이루어짐
 
+```shell
+echo "PID Check..."
+
+CURRENT_PID=$(ps -ef | grep java | grep awesome | awk '{print $2}')
+
+echo "Running PID: {$CURRENT_PID}"
+if [ -z $CURRENT_PID ]; then
+  echo "> 현재 구동중인 애플리케이션이 없으므로 종료하지 않습니다."
+else
+  echo "> kill -9 $CURRENT_PID"
+  kill -9 $CURRENT_PID
+sleep 10
+fi
+
+echo "Deploy Project...."
+
+nohup java -Djasypt.encryptor.password=rational31 -Dspring.profiles.active=real -jar /var/lib/jenkins/workspace/awesome/build/libs/AwesomeProject-0.0.1-SNAPSHOT.jar &
+```
+
 # 느낀점
 
 * 웹플럭스를 활용해볼 수 있다는 점이 매력적이었음
