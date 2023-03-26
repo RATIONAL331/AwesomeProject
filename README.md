@@ -8,6 +8,8 @@
 
 * ![awesome_system.jpeg](/system.jpeg)
 
+* 폴더는 Object Storage에 업로드 되지 않고 오로지 File류만 Object Storage에 업로드 되도록 구현되어 
+
 # 구현 API 목록
 
 * 호스트 정보
