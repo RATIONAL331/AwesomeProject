@@ -7,8 +7,11 @@ import com.rational.awesomeproject.repository.converter.OffsetDateTimeWriteConve
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.mongodb.ReactiveMongoDatabaseFactory;
+import org.springframework.data.mongodb.ReactiveMongoTransactionManager;
 import org.springframework.data.mongodb.config.AbstractReactiveMongoConfiguration;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
+import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 import org.springframework.data.mongodb.core.convert.MongoCustomConversions;
 import org.springframework.data.mongodb.repository.config.EnableReactiveMongoRepositories;
 
@@ -25,15 +28,25 @@ public class MongoRepositoryConfig extends AbstractReactiveMongoConfiguration {
 		return MongoClients.create(mongoUrl);
 	}
 
+	@Override
+	public ReactiveMongoTemplate reactiveMongoTemplate(ReactiveMongoDatabaseFactory databaseFactory, MappingMongoConverter mongoConverter) {
+		return reactiveMongoTemplate();
+	}
+
+	@Override
+	public MongoClient reactiveMongoClient() {
+		return mongoClient();
+	}
+
 	@Bean
 	public ReactiveMongoTemplate reactiveMongoTemplate() {
 		return new ReactiveMongoTemplate(this.mongoClient(), this.getDatabaseName());
 	}
 
-//	@Bean
-//	ReactiveMongoTransactionManager transactionManager(ReactiveMongoDatabaseFactory reactiveMongoDatabaseFactory) {
-//		return new ReactiveMongoTransactionManager(reactiveMongoDatabaseFactory);
-//	}
+	@Bean
+	ReactiveMongoTransactionManager transactionManager(ReactiveMongoDatabaseFactory reactiveMongoDatabaseFactory) {
+		return new ReactiveMongoTransactionManager(reactiveMongoDatabaseFactory);
+	}
 
 	@Override
 	protected String getDatabaseName() {
