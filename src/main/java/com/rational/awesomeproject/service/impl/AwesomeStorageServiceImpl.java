@@ -57,7 +57,8 @@ public class AwesomeStorageServiceImpl implements AwesomeStorageService {
 	@Override
 	public Mono<Tuple2<AwesomeStorage, Resource>> downloadStorage(String userId, String storageId) {
 		Mono<AwesomeStorage> storage = storageReactiveRepository.findByIdAndUserId(storageId, userId)
-		                                                        .switchIfEmpty(Mono.defer(() -> Mono.error(new RuntimeException("Not Exist File/Folder"))));
+		                                                        .filter(awesomeStorage -> awesomeStorage.getExtType() == StorageExtType.FILE)
+		                                                        .switchIfEmpty(Mono.defer(() -> Mono.error(new RuntimeException("Not Exist File/Folder or Only download File"))));
 		Mono<InputStreamResource> file = DataBufferUtils.join(fileStorageService.download(userId, storageId))
 		                                                .map(dataBuffer -> new InputStreamResource(dataBuffer.asInputStream()));
 		return Mono.zip(storage, file);
