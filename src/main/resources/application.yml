@@ -28,17 +28,17 @@ spring:
       on-profile: real
   data:
     mongodb:
-      uri: mongodb://rational31:!rational31@fpan1.vpc.mg.naverncp.com:17017,fpan5.vpc.mg.naverncp.com:17017,fpan9.vpc.mg.naverncp.com:17017/awesome?replicaSet=rational31001
-      host: fpan1.vpc.mg.naverncp.com:17017,fpan5.vpc.mg.naverncp.com:17017,fpan9.vpc.mg.naverncp.com:17017
+      uri: ENC(3K3HJ3bhtUBOxoYfaL1KrP7AF+8cVjIx+KqwxSadrBBcwoIyrHhr8C2CKLGQlE/fMbgHyyZpUAJL6fQzohCNBjf25S3dzeuBs7StySfC1FtGXAFwByLW5A3mumd2o6Nthu+kq1x0xl2nl/o658K0fViUnQn3zEtJndVtv/gi+b9Bo2bBdgtQlWFZbBMVmYygAFbvb7ud1ksIUigUn6vshlbxLS1YV/+5eub0TTed2ebwD9xpEhPaN8oi8uXdpLtuol6408+qEApAkBPYgQMNug==)
+      host: ENC(5djq9uUxXVfOik71Gw9R3DyLn4kOEgBTuIK4G2d3cqM3L5T+bkbpqrI33LaSSDC9DVNWI145sgBUC0TaVOrYfSVuwvftpR7y5TI6c+6W5g3Pf598Z2M4qfHYmsyFhHAUVL9844k3A+eayzEBT5dipJBkSmd1oKv7cIpQ2MDJDbk=)
       port: 17017
       database: awesome
-      username: rational31
-      password: "!rational31"
+      username: ENC(PGZ7CFAgk4ae3WCHNxbYS/NalfkE1ewCWMFG7mRoZdhA5CfEnCsPM5DtQLNlsBDq)
+      password: ENC(0sLb6Dokoxa3EwW8iQlhbSKeDSkckTVTs86eCIM9/9wzKomQ3OVJFs7cwTZB/DXt)
       replica-set-name: rational31001
 server:
   port: 8081
 
 
 mongo:
-  url: mongodb://rational31:!rational31@fpan1.vpc.mg.naverncp.com:17017,fpan5.vpc.mg.naverncp.com:17017,fpan9.vpc.mg.naverncp.com:17017/awesome?replicaSet=rational31001
+  url: ENC(3K3HJ3bhtUBOxoYfaL1KrP7AF+8cVjIx+KqwxSadrBBcwoIyrHhr8C2CKLGQlE/fMbgHyyZpUAJL6fQzohCNBjf25S3dzeuBs7StySfC1FtGXAFwByLW5A3mumd2o6Nthu+kq1x0xl2nl/o658K0fViUnQn3zEtJndVtv/gi+b9Bo2bBdgtQlWFZbBMVmYygAFbvb7ud1ksIUigUn6vshlbxLS1YV/+5eub0TTed2ebwD9xpEhPaN8oi8uXdpLtuol6408+qEApAkBPYgQMNug==)
 
