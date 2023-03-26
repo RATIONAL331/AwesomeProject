@@ -26,9 +26,13 @@ spring:
   config:
     activate:
       on-profile: real
+  data:
+    mongodb:
+      uri: mongodb://rational331:!rational331@fpan1.vpc.mg.naverncp.com:17017,fpan5.vpc.mg.naverncp.com:17017,fpan9.vpc.mg.naverncp.com:17017/rational31?replicaSet=rational31001
 
 server:
   port: 8081
+
 
 mongo:
   url: mongodb://rational331:!rational331@fpan1.vpc.mg.naverncp.com:17017,fpan5.vpc.mg.naverncp.com:17017,fpan9.vpc.mg.naverncp.com:17017/rational31?replicaSet=rational31001
