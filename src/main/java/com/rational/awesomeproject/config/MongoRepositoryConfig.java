@@ -23,24 +23,14 @@ public class MongoRepositoryConfig extends AbstractReactiveMongoConfiguration {
 	@Value("${mongo.url}")
 	private String mongoUrl;
 
-	@Bean
-	public MongoClient mongoClient() {
-		return MongoClients.create(mongoUrl);
-	}
-
 	@Override
 	public ReactiveMongoTemplate reactiveMongoTemplate(ReactiveMongoDatabaseFactory databaseFactory, MappingMongoConverter mongoConverter) {
-		return reactiveMongoTemplate();
+		return new ReactiveMongoTemplate(reactiveMongoClient(), this.getDatabaseName());
 	}
 
 	@Override
 	public MongoClient reactiveMongoClient() {
-		return mongoClient();
-	}
-
-	@Bean
-	public ReactiveMongoTemplate reactiveMongoTemplate() {
-		return new ReactiveMongoTemplate(this.mongoClient(), this.getDatabaseName());
+		return MongoClients.create(mongoUrl);
 	}
 
 	@Bean
