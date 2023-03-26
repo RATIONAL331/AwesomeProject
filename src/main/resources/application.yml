@@ -1,6 +1,31 @@
+spring:
+  profiles:
+    active: local
+---
+
 jwtSecretKey: ENC(HvtNdNbze/htNthbiN2a7+PIkgtHrxO4m4SjoX9GalZZxU4KPyX+E9CsWmRaGgxJ0GMb+DJOyyylHfViXuwyyKt2jtqO2Ps06ugApWcoeAVH5EGY8eOzBukkDtOLix96Uw0fvAFiS1Dr5i6PR1mpcw==)
 
 storage:
   endpoint: https://kr.object.ncloudstorage.com
   access-key: ENC(jqppedRAMM3B4pjB3h3orheellQWd+taO0sEb3PtWnwdQ2WyHgF97Jtysz1x5Ch2jy96B8+nrtgc1jpfyHTokg==)
   secret-key: ENC(CLWYwkC0aY4d0du0vGuAgznwRiPCspEPqbY2hXFbw49yvQp7RZt0Bn2nEisB2nt+ktFbhgzctxvtrxoIao3Bls98jerRAiMQ6N2PGrHgPT8=)
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: local
+
+mongo:
+  url: mongodb://localhost:27017
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: real
+
+mongo:
+  url: mongodb://rational331:!rational331@fpan1.vpc.mg.naverncp.com:17017,fpan5.vpc.mg.naverncp.com:17017,fpan9.vpc.mg.naverncp.com:17017/rational31?replicaSet=rational31001

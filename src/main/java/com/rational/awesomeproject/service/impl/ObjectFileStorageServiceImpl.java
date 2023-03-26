@@ -3,8 +3,6 @@ package com.rational.awesomeproject.service.impl;
 import com.rational.awesomeproject.service.FileStorageService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Hex;
-import org.apache.http.client.HttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpHeaders;
@@ -36,7 +34,6 @@ import java.util.TreeMap;
 public class ObjectFileStorageServiceImpl implements FileStorageService {
 	private static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("yyyyMMdd");
 	private static final SimpleDateFormat TIME_FORMATTER = new SimpleDateFormat("yyyyMMdd\'T\'HHmmss\'Z\'");
-	private static final HttpClient httpClient = HttpClientBuilder.create().build();
 	private static final Charset CHARSET_NAME = StandardCharsets.UTF_8;
 	private static final String HMAC_ALGORITHM = "HmacSHA256";
 	private static final String HASH_ALGORITHM = "SHA-256";
@@ -102,7 +99,6 @@ public class ObjectFileStorageServiceImpl implements FileStorageService {
 	}
 
 	private void setHttpHeader(HttpMethod method, HttpHeaders httpHeaders, URI storageUri) {
-		String regionName = "kr-standard";
 		Date now = new Date();
 		DATE_FORMATTER.setTimeZone(TimeZone.getTimeZone("UTC"));
 		TIME_FORMATTER.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -118,10 +114,10 @@ public class ObjectFileStorageServiceImpl implements FileStorageService {
 		String signedHeaders = getSignedHeaders(sortedHeaders);
 		String standardizedHeaders = getStandardizedHeaders(sortedHeaders);
 		String canonicalRequest = getCanonicalRequest(method, storageUri, standardizedQueryParameters, standardizedHeaders, signedHeaders);
-		String scope = getScope(datestamp, regionName);
+		String scope = getScope(datestamp, REGION_NAME);
 
 		String stringToSign = getStringToSign(timestamp, scope, canonicalRequest);
-		String signature = getSignature(secretKey, datestamp, regionName, stringToSign);
+		String signature = getSignature(secretKey, datestamp, REGION_NAME, stringToSign);
 		String authorization = getAuthorization(accessKey, scope, signedHeaders, signature);
 		httpHeaders.add("Authorization", authorization);
 	}

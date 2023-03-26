@@ -85,9 +85,9 @@ public class AwesomeStorageServiceImpl implements AwesomeStorageService {
 	public Mono<Boolean> removeStorageByStorageId(String userId, String storageId) {
 		// when try to remove root folder => filtering
 		return getAwesomeStorageByUserId(userId, storageId).filter(storage -> storage.getParentStorageId() != null)
-		                                                   .flatMap(this::removeStorage)
+		                                                   .flatMap(awesomeStorage -> removeStorage(userId, awesomeStorage))
 		                                                   .flatMap(this::recalculateSize)
-		                                                   .flatMap(storage -> fileStorageService.delete(userId, storage.getId()));
+		                                                   .thenReturn(true);
 	}
 
 	private Mono<AwesomeStorage> getAwesomeStorageByUserId(String userId, String storageId) {
@@ -103,17 +103,18 @@ public class AwesomeStorageServiceImpl implements AwesomeStorageService {
 				.hasElements();
 	}
 
-	private Mono<AwesomeStorage> removeStorage(AwesomeStorage awesomeStorage) {
+	private Mono<AwesomeStorage> removeStorage(String userId, AwesomeStorage awesomeStorage) {
 		awesomeStorage.setDeletedAt(OffsetDateTime.now());
 		// if storage is folder, remove all child folder and file
 		if (awesomeStorage.getExtType() == StorageExtType.FOLDER) {
 			return storageReactiveRepository.findAllByParentStorageIdAndDeletedAtIsNull(awesomeStorage.getId())
-			                                .flatMap(this::removeStorage)
+			                                .flatMap((storage) -> removeStorage(userId, storage))
 			                                .then(storageReactiveRepository.save(awesomeStorage));
 		}
 
 		// if storage is file, just remove
-		return storageReactiveRepository.save(awesomeStorage);
+		return fileStorageService.delete(userId, awesomeStorage.getId())
+		                         .flatMap(bool -> storageReactiveRepository.save(awesomeStorage));
 	}
 
 	private Mono<AwesomeStorage> recalculateSize(AwesomeStorage awesomeStorage) {

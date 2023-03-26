@@ -4,6 +4,7 @@ import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoClients;
 import com.rational.awesomeproject.repository.converter.OffsetDateTimeReadConverter;
 import com.rational.awesomeproject.repository.converter.OffsetDateTimeWriteConverter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.config.AbstractReactiveMongoConfiguration;
@@ -16,9 +17,12 @@ import java.util.Arrays;
 @Configuration
 @EnableReactiveMongoRepositories(basePackages = "com.rational.awesomeproject")
 public class MongoRepositoryConfig extends AbstractReactiveMongoConfiguration {
+	@Value("${mongo.url}")
+	private String mongoUrl;
+
 	@Bean
 	public MongoClient mongoClient() {
-		return MongoClients.create("mongodb://localhost:27017/awesome");
+		return MongoClients.create(mongoUrl);
 	}
 
 	@Bean
