@@ -23,6 +23,7 @@ import java.time.LocalDateTime;
 @Service
 @RequiredArgsConstructor
 public class AwesomeStorageServiceImpl implements AwesomeStorageService {
+	private static final long MAX_STORAGE_SIZE = 1024 * 1024 * 1024 * 30L; // 30GB
 	private final AwesomeUserReactiveRepository userReactiveRepository;
 	private final AwesomeStorageReactiveRepository storageReactiveRepository;
 	private final FileStorageService fileStorageService;
@@ -67,16 +68,19 @@ public class AwesomeStorageServiceImpl implements AwesomeStorageService {
 	@Override
 	@Transactional
 	public Mono<AwesomeStorageDto> saveStorage(String userId, String parentStorageId, FilePart filePart) {
-
 		return alreadyExistStorageNameInParentStorage(userId, parentStorageId, filePart.filename(), StorageExtType.FILE)
 				.filter(bool -> !bool)
 				// 1. read file size
 				.flatMap(bool -> filePart.content().reduce(0L, (size, buffer) -> size + buffer.readableByteCount()))
-				// 2. save storage
+				// 2. check storage size
+				.flatMap(fileSize -> getRootStorageByUserId(userId).filter(storage -> storage.getStorageFileSize() + fileSize <= MAX_STORAGE_SIZE)
+				                                                   .switchIfEmpty(Mono.defer(() -> Mono.error(new RuntimeException("Exceed Max Storage Size"))))
+				                                                   .thenReturn(fileSize))
+				// 3. save storage
 				.flatMap(fileSize -> storageReactiveRepository.save(AwesomeStorage.makeFile(userId, parentStorageId, filePart.filename(), fileSize)))
-				// 3. upload object storage
+				// 4. upload object storage
 				.flatMap(storage -> fileStorageService.upload(userId, storage.getId(), storage.getStorageName(), storage.getStorageFileSize(), filePart)
-				                                      // 4. recalculate size
+				                                      // 5. recalculate size
 				                                      .flatMap(bool -> recalculateSize(storage)))
 				.map(AwesomeStorageDto::of);
 	}
