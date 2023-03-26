@@ -33,7 +33,7 @@ spring:
       port: 17017
       database: rational31
       username: rational331
-      password: !rational331
+      password: "!rational331"
       replica-set-name: rational31001
 server:
   port: 8081
