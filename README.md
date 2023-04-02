@@ -1,5 +1,8 @@
 # Awesome Project
 
+# 구현 과제
+* https://www.numble.it/deepdive/33
+
 # 모델 설계도
 
 * ![awesome_project_model.jpeg](/mockup-1.jpeg)
