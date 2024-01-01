@@ -1,7 +1,7 @@
 # Awesome Project
 
 # 구현 과제
-* https://www.numble.it/deepdive/33
+* [https://www.numble.it/deepdive/33](https://www.numble.it/deepdive/851a2dc7-8bc1-4c11-97f8-aa6ed1bd624f)
 
 # 모델 설계도
 
@@ -285,7 +285,7 @@ true
 # 미구현 기능
 
 * 폴더 다운로드 기능
-* 테스트 X
+* 테스트가 부족함
 * 성능 부하 테스트 X
 * 프론트가 없어서 테스트가 불편함
 
